@@ -1,0 +1,6 @@
+@MYMCarRental.API_HostAddress = http://localhost:5145
+
+GET {{MYMCarRental.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="MYMCarRental.API/MYMCarRental.API.csproj" />
+  <Project Path="MYMCarRental.Application/MYMCarRental.Application.csproj" />
+  <Project Path="MYMCarRental.Domain/MYMCarRental.Domain.csproj" />
+  <Project Path="MYMCarRental.Infrastructure/MYMCarRental.Infrastructure.csproj" />
+</Solution>
