@@ -1,80 +1,66 @@
-﻿using MYMCarRental.Domain.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using MYMCarRental.Domain.Enums;
 
-namespace MYMCarRental.Domain.Entities;
+namespace MYMCarRental.Application.DTOs.Cars;
 
-public class Car
+public class UpdateCarDto
 {
-    public int Id { get; set; }
-
+    [Required]
     public int CategoryId { get; set; }
 
     // =========================
     // Multilingual Content
     // =========================
 
+    [Required]
+    [MaxLength(150)]
     public string NameAr { get; set; } = string.Empty;
 
+    [Required]
+    [MaxLength(150)]
     public string NameEn { get; set; } = string.Empty;
 
+    [MaxLength(1000)]
     public string? DescriptionAr { get; set; }
 
+    [MaxLength(1000)]
     public string? DescriptionEn { get; set; }
 
     // =========================
     // Pricing
     // =========================
 
+    [Range(0, double.MaxValue)]
     public decimal PricePerDay { get; set; }
 
+    [Range(0, double.MaxValue)]
     public decimal PricePerWeek { get; set; }
 
+    [Range(0, double.MaxValue)]
     public decimal PricePerMonth { get; set; }
 
     // =========================
-    // Car Specifications
+    // Specifications
     // =========================
 
     public Transmission Transmission { get; set; }
 
     public FuelType FuelType { get; set; }
 
+    [Range(1, 20)]
     public int Seats { get; set; }
 
+    [Range(1, 10)]
     public int Doors { get; set; }
 
+    [Range(0, 20)]
     public int Luggage { get; set; }
-
-    // =========================
-    // Reviews
-    // =========================
-
-    public decimal Rating { get; set; }
-
-    public int ReviewsCount { get; set; }
 
     // =========================
     // Status
     // =========================
 
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
 
     public bool IsFeatured { get; set; }
-
-    // =========================
-    // Audit
-    // =========================
-
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
-
-    // =========================
-    // Relationships
-    // =========================
-
-    public CarCategory Category { get; set; } = null!;
-
-    public ICollection<CarImage> Images { get; set; } = new List<CarImage>();
-
-    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 }

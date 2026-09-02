@@ -12,9 +12,27 @@ public class CarCategoryConfiguration : IEntityTypeConfiguration<CarCategory>
 
         builder.HasKey(c => c.Id);
 
-        builder.Property(c => c.Name)
+        // =========================
+        // Multilingual Content
+        // =========================
+
+        builder.Property(c => c.NameAr)
             .IsRequired()
             .HasMaxLength(100);
+
+        builder.Property(c => c.NameEn)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(c => c.DescriptionAr)
+            .HasMaxLength(500);
+
+        builder.Property(c => c.DescriptionEn)
+            .HasMaxLength(500);
+
+        // =========================
+        // Identification
+        // =========================
 
         builder.Property(c => c.Slug)
             .IsRequired()
@@ -23,8 +41,9 @@ public class CarCategoryConfiguration : IEntityTypeConfiguration<CarCategory>
         builder.HasIndex(c => c.Slug)
             .IsUnique();
 
-        builder.Property(c => c.Description)
-            .HasMaxLength(500);
+        // =========================
+        // Image
+        // =========================
 
         builder.Property(c => c.ImageUrl)
             .HasMaxLength(500);
@@ -32,13 +51,30 @@ public class CarCategoryConfiguration : IEntityTypeConfiguration<CarCategory>
         builder.Property(c => c.ImagePublicId)
             .HasMaxLength(255);
 
+        // =========================
+        // Status
+        // =========================
+
         builder.Property(c => c.IsActive)
             .HasDefaultValue(true);
+
+        // =========================
+        // Audit
+        // =========================
 
         builder.Property(c => c.CreatedAt)
             .IsRequired();
 
         builder.Property(c => c.UpdatedAt)
             .IsRequired();
+
+        // =========================
+        // Relationships
+        // =========================
+
+        builder.HasMany(c => c.Cars)
+            .WithOne(c => c.Category)
+            .HasForeignKey(c => c.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -12,12 +12,27 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
 
         builder.HasKey(c => c.Id);
 
-        builder.Property(c => c.Name)
+        // =========================
+        // Multilingual Content
+        // =========================
+
+        builder.Property(c => c.NameAr)
             .IsRequired()
             .HasMaxLength(150);
 
-        builder.Property(c => c.Description)
+        builder.Property(c => c.NameEn)
+            .IsRequired()
+            .HasMaxLength(150);
+
+        builder.Property(c => c.DescriptionAr)
             .HasMaxLength(1000);
+
+        builder.Property(c => c.DescriptionEn)
+            .HasMaxLength(1000);
+
+        // =========================
+        // Pricing
+        // =========================
 
         builder.Property(c => c.PricePerDay)
             .HasPrecision(18, 2);
@@ -28,8 +43,16 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
         builder.Property(c => c.PricePerMonth)
             .HasPrecision(18, 2);
 
+        // =========================
+        // Rating
+        // =========================
+
         builder.Property(c => c.Rating)
             .HasPrecision(3, 2);
+
+        // =========================
+        // Specifications
+        // =========================
 
         builder.Property(c => c.Transmission)
             .IsRequired();
@@ -37,17 +60,29 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
         builder.Property(c => c.FuelType)
             .IsRequired();
 
+        // =========================
+        // Status
+        // =========================
+
         builder.Property(c => c.IsActive)
             .HasDefaultValue(true);
 
         builder.Property(c => c.IsFeatured)
             .HasDefaultValue(false);
 
+        // =========================
+        // Audit
+        // =========================
+
         builder.Property(c => c.CreatedAt)
             .IsRequired();
 
         builder.Property(c => c.UpdatedAt)
             .IsRequired();
+
+        // =========================
+        // Indexes
+        // =========================
 
         builder.HasIndex(c => c.CategoryId);
 
@@ -56,6 +91,10 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
             c.IsActive,
             c.IsFeatured
         });
+
+        // =========================
+        // Relationships
+        // =========================
 
         builder.HasOne(c => c.Category)
             .WithMany(c => c.Cars)

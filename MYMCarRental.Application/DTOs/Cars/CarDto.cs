@@ -1,8 +1,8 @@
 ﻿using MYMCarRental.Domain.Enums;
 
-namespace MYMCarRental.Domain.Entities;
+namespace MYMCarRental.Application.DTOs.Cars;
 
-public class Car
+public class CarDto
 {
     public int Id { get; set; }
 
@@ -21,6 +21,14 @@ public class Car
     public string? DescriptionEn { get; set; }
 
     // =========================
+    // Category
+    // =========================
+
+    public string CategoryNameAr { get; set; } = string.Empty;
+
+    public string CategoryNameEn { get; set; } = string.Empty;
+
+    // =========================
     // Pricing
     // =========================
 
@@ -31,7 +39,7 @@ public class Car
     public decimal PricePerMonth { get; set; }
 
     // =========================
-    // Car Specifications
+    // Specifications
     // =========================
 
     public Transmission Transmission { get; set; }
@@ -56,9 +64,17 @@ public class Car
     // Status
     // =========================
 
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
 
     public bool IsFeatured { get; set; }
+
+    // =========================
+    // Images
+    // =========================
+
+    public string? PrimaryImageUrl { get; set; }
+
+    public List<CarImageDto> Images { get; set; } = new();
 
     // =========================
     // Audit
@@ -67,14 +83,4 @@ public class Car
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
-
-    // =========================
-    // Relationships
-    // =========================
-
-    public CarCategory Category { get; set; } = null!;
-
-    public ICollection<CarImage> Images { get; set; } = new List<CarImage>();
-
-    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 }

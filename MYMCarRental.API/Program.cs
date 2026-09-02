@@ -33,9 +33,8 @@ builder.Services.AddSingleton(cloudinary);
 builder.Services.AddScoped<
     IImageStorageService,
     CloudinaryImageStorageService>();
-builder.Services.AddScoped<
-    ICategoryService,
-    CategoryService>();
+builder.Services.AddScoped<ICategoryService,CategoryService>();
+builder.Services.AddScoped<ICarService,CarService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

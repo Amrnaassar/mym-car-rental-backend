@@ -19,17 +19,23 @@ public class CategoryService : ICategoryService
         _imageStorage = imageStorage;
     }
 
+    // =========================
+    // Get All
+    // =========================
+
     public async Task<IEnumerable<CategoryDto>> GetAllAsync()
     {
         var categories = await _context.CarCategories
             .AsNoTracking()
-            .OrderBy(c => c.Name)
+            .OrderBy(c => c.NameEn)
             .Select(c => new CategoryDto
             {
                 Id = c.Id,
-                Name = c.Name,
+                NameAr = c.NameAr,
+                NameEn = c.NameEn,
                 Slug = c.Slug,
-                Description = c.Description,
+                DescriptionAr = c.DescriptionAr,
+                DescriptionEn = c.DescriptionEn,
                 ImageUrl = c.ImageUrl,
                 IsActive = c.IsActive,
                 CreatedAt = c.CreatedAt,
@@ -40,6 +46,10 @@ public class CategoryService : ICategoryService
         return categories;
     }
 
+    // =========================
+    // Get By Id
+    // =========================
+
     public async Task<CategoryDto?> GetByIdAsync(int id)
     {
         return await _context.CarCategories
@@ -48,9 +58,11 @@ public class CategoryService : ICategoryService
             .Select(c => new CategoryDto
             {
                 Id = c.Id,
-                Name = c.Name,
+                NameAr = c.NameAr,
+                NameEn = c.NameEn,
                 Slug = c.Slug,
-                Description = c.Description,
+                DescriptionAr = c.DescriptionAr,
+                DescriptionEn = c.DescriptionEn,
                 ImageUrl = c.ImageUrl,
                 IsActive = c.IsActive,
                 CreatedAt = c.CreatedAt,
@@ -58,6 +70,10 @@ public class CategoryService : ICategoryService
             })
             .FirstOrDefaultAsync();
     }
+
+    // =========================
+    // Get By Slug
+    // =========================
 
     public async Task<CategoryDto?> GetBySlugAsync(string slug)
     {
@@ -69,9 +85,11 @@ public class CategoryService : ICategoryService
             .Select(c => new CategoryDto
             {
                 Id = c.Id,
-                Name = c.Name,
+                NameAr = c.NameAr,
+                NameEn = c.NameEn,
                 Slug = c.Slug,
-                Description = c.Description,
+                DescriptionAr = c.DescriptionAr,
+                DescriptionEn = c.DescriptionEn,
                 ImageUrl = c.ImageUrl,
                 IsActive = c.IsActive,
                 CreatedAt = c.CreatedAt,
@@ -80,14 +98,22 @@ public class CategoryService : ICategoryService
             .FirstOrDefaultAsync();
     }
 
+    // =========================
+    // Create
+    // =========================
+
     public async Task<CategoryDto> CreateAsync(
         CreateCategoryDto dto,
         Stream? imageStream,
         string? imageFileName)
     {
-        var name = dto.Name.Trim();
+        var nameAr = dto.NameAr.Trim();
+        var nameEn = dto.NameEn.Trim();
+
         var slug = dto.Slug.Trim().ToLower();
-        var description = dto.Description?.Trim();
+
+        var descriptionAr = dto.DescriptionAr?.Trim();
+        var descriptionEn = dto.DescriptionEn?.Trim();
 
         var slugExists = await _context.CarCategories
             .AnyAsync(c => c.Slug == slug);
@@ -100,15 +126,26 @@ public class CategoryService : ICategoryService
 
         var category = new CarCategory
         {
-            Name = name,
+            NameAr = nameAr,
+            NameEn = nameEn,
+
             Slug = slug,
-            Description = description,
+
+            DescriptionAr = descriptionAr,
+            DescriptionEn = descriptionEn,
+
             IsActive = true,
+
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
 
-        if (imageStream is not null && !string.IsNullOrWhiteSpace(imageFileName))
+        // =========================
+        // Upload Category Image
+        // =========================
+
+        if (imageStream is not null &&
+            !string.IsNullOrWhiteSpace(imageFileName))
         {
             var result = await _imageStorage.UploadAsync(
                 imageStream,
@@ -126,6 +163,10 @@ public class CategoryService : ICategoryService
         return MapToDto(category);
     }
 
+    // =========================
+    // Update
+    // =========================
+
     public async Task<CategoryDto?> UpdateAsync(
         int id,
         UpdateCategoryDto dto,
@@ -140,9 +181,17 @@ public class CategoryService : ICategoryService
             return null;
         }
 
-        var name = dto.Name.Trim();
+        var nameAr = dto.NameAr.Trim();
+        var nameEn = dto.NameEn.Trim();
+
         var slug = dto.Slug.Trim().ToLower();
-        var description = dto.Description?.Trim();
+
+        var descriptionAr = dto.DescriptionAr?.Trim();
+        var descriptionEn = dto.DescriptionEn?.Trim();
+
+        // =========================
+        // Check Slug
+        // =========================
 
         var slugExists = await _context.CarCategories
             .AnyAsync(c =>
@@ -155,14 +204,29 @@ public class CategoryService : ICategoryService
                 "A category with this slug already exists.");
         }
 
+        // Keep old image public id
         var oldPublicId = category.ImagePublicId;
 
-        category.Name = name;
+        // =========================
+        // Update Data
+        // =========================
+
+        category.NameAr = nameAr;
+        category.NameEn = nameEn;
+
         category.Slug = slug;
-        category.Description = description;
+
+        category.DescriptionAr = descriptionAr;
+        category.DescriptionEn = descriptionEn;
+
         category.UpdatedAt = DateTime.UtcNow;
 
-        if (imageStream is not null && !string.IsNullOrWhiteSpace(imageFileName))
+        // =========================
+        // Replace Image
+        // =========================
+
+        if (imageStream is not null &&
+            !string.IsNullOrWhiteSpace(imageFileName))
         {
             var result = await _imageStorage.UploadAsync(
                 imageStream,
@@ -174,6 +238,7 @@ public class CategoryService : ICategoryService
 
             await _context.SaveChangesAsync();
 
+            // Delete old image from Cloudinary
             if (!string.IsNullOrWhiteSpace(oldPublicId))
             {
                 await _imageStorage.DeleteAsync(oldPublicId);
@@ -187,6 +252,10 @@ public class CategoryService : ICategoryService
         return MapToDto(category);
     }
 
+    // =========================
+    // Delete
+    // =========================
+
     public async Task<bool> DeleteAsync(int id)
     {
         var category = await _context.CarCategories
@@ -198,6 +267,7 @@ public class CategoryService : ICategoryService
             return false;
         }
 
+        // Cannot delete category if it has cars
         if (category.Cars.Any())
         {
             throw new InvalidOperationException(
@@ -210,6 +280,7 @@ public class CategoryService : ICategoryService
 
         await _context.SaveChangesAsync();
 
+        // Delete image from Cloudinary
         if (!string.IsNullOrWhiteSpace(publicId))
         {
             await _imageStorage.DeleteAsync(publicId);
@@ -218,16 +289,28 @@ public class CategoryService : ICategoryService
         return true;
     }
 
+    // =========================
+    // Mapping
+    // =========================
+
     private static CategoryDto MapToDto(CarCategory category)
     {
         return new CategoryDto
         {
             Id = category.Id,
-            Name = category.Name,
+
+            NameAr = category.NameAr,
+            NameEn = category.NameEn,
+
             Slug = category.Slug,
-            Description = category.Description,
+
+            DescriptionAr = category.DescriptionAr,
+            DescriptionEn = category.DescriptionEn,
+
             ImageUrl = category.ImageUrl,
+
             IsActive = category.IsActive,
+
             CreatedAt = category.CreatedAt,
             UpdatedAt = category.UpdatedAt
         };

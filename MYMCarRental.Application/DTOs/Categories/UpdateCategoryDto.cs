@@ -6,12 +6,19 @@ public class UpdateCategoryDto
 {
     [Required]
     [MaxLength(100)]
-    public string Name { get; set; } = string.Empty;
+    public string NameAr { get; set; } = string.Empty;
+
+    [Required]
+    [MaxLength(100)]
+    public string NameEn { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(100)]
     public string Slug { get; set; } = string.Empty;
 
     [MaxLength(500)]
-    public string? Description { get; set; }
+    public string? DescriptionAr { get; set; }
+
+    [MaxLength(500)]
+    public string? DescriptionEn { get; set; }
 }
