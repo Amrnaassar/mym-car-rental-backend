@@ -29,6 +29,9 @@ public class CarCategoryConfiguration : IEntityTypeConfiguration<CarCategory>
         builder.Property(c => c.ImageUrl)
             .HasMaxLength(500);
 
+        builder.Property(c => c.ImagePublicId)
+            .HasMaxLength(255);
+
         builder.Property(c => c.IsActive)
             .HasDefaultValue(true);
 

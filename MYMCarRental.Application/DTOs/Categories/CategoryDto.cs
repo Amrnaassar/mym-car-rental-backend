@@ -1,6 +1,6 @@
-﻿using MYMCarRental.Domain.Entities;
+﻿namespace MYMCarRental.Application.DTOs.Categories;
 
-public class CarCategory
+public class CategoryDto
 {
     public int Id { get; set; }
 
@@ -12,13 +12,9 @@ public class CarCategory
 
     public string? ImageUrl { get; set; }
 
-    public string? ImagePublicId { get; set; }
-
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
-
-    public ICollection<Car> Cars { get; set; } = new List<Car>();
 }
