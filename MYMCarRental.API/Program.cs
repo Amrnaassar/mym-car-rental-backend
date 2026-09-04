@@ -49,6 +49,18 @@ builder.Services.AddSingleton(cloudinary);
 // Application Services
 // ========================================================
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularClient", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddScoped<IImageStorageService,CloudinaryImageStorageService>();
 
 builder.Services.AddScoped<ICategoryService,CategoryService>();
@@ -60,8 +72,6 @@ builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped<IAuthService,AuthService>();
 
 builder.Services.AddScoped<IJwtService,JwtService>();
-
-builder.Services.AddScoped<ILocationService,LocationService>();
 
 builder.Services.AddScoped<IBookingService,BookingService>();
 
@@ -99,24 +109,35 @@ builder.Services
             new TokenValidationParameters
             {
                 ValidateIssuer = true,
-
                 ValidateAudience = true,
-
                 ValidateLifetime = true,
-
                 ValidateIssuerSigningKey = true,
 
                 ValidIssuer = jwtSettings.Issuer,
-
                 ValidAudience = jwtSettings.Audience,
 
                 IssuerSigningKey =
                     new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(
-                            jwtSettings.Key)),
+                        Encoding.UTF8.GetBytes(jwtSettings.Key)),
 
                 ClockSkew = TimeSpan.FromSeconds(30)
             };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken =
+                    context.Request.Cookies["mym_access_token"];
+
+                if (!string.IsNullOrWhiteSpace(accessToken))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 
@@ -183,7 +204,9 @@ app.UseSwagger();
 
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+
+app.UseCors("AngularClient");
 
 app.UseAuthentication();
 

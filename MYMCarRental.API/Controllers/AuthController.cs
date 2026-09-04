@@ -10,6 +10,9 @@ namespace MYMCarRental.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
+    private const string AccessTokenCookie = "mym_access_token";
+    private const string RefreshTokenCookie = "mym_refresh_token";
+
     private readonly IAuthService _authService;
 
     public AuthController(IAuthService authService)
@@ -32,7 +35,16 @@ public class AuthController : ControllerBase
             var result =
                 await _authService.GoogleLoginAsync(dto);
 
-            return Ok(result);
+            SetAuthCookies(result);
+
+            return Ok(new
+            {
+                user = result.User,
+                accessTokenExpiresAt =
+                    result.AccessTokenExpiresAt,
+                refreshTokenExpiresAt =
+                    result.RefreshTokenExpiresAt
+            });
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -50,22 +62,43 @@ public class AuthController : ControllerBase
 
     [HttpPost("refresh-token")]
     [AllowAnonymous]
-    public async Task<IActionResult> RefreshToken(
-        [FromBody] RefreshTokenRequestDto dto)
+    public async Task<IActionResult> RefreshToken()
     {
+        var refreshToken =
+            Request.Cookies[RefreshTokenCookie];
+
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return Unauthorized(new
+            {
+                message = "Refresh token is missing."
+            });
+        }
+
         var result =
             await _authService.RefreshTokenAsync(
-                dto.RefreshToken);
+                refreshToken);
 
         if (result is null)
         {
+            ClearAuthCookies();
+
             return Unauthorized(new
             {
                 message = "Invalid or expired refresh token."
             });
         }
 
-        return Ok(result);
+        SetAuthCookies(result);
+
+        return Ok(new
+        {
+            user = result.User,
+            accessTokenExpiresAt =
+                result.AccessTokenExpiresAt,
+            refreshTokenExpiresAt =
+                result.RefreshTokenExpiresAt
+        });
     }
 
 
@@ -134,6 +167,73 @@ public class AuthController : ControllerBase
             });
         }
 
+        ClearAuthCookies();
+
         return NoContent();
+    }
+
+
+    // ========================================================
+    // Cookie Helpers
+    // ========================================================
+
+    private void SetAuthCookies(
+        AuthResponseDto result)
+    {
+        var accessTokenOptions =
+            CreateCookieOptions(
+                result.AccessTokenExpiresAt);
+
+        var refreshTokenOptions =
+            CreateCookieOptions(
+                result.RefreshTokenExpiresAt);
+
+        Response.Cookies.Append(
+            AccessTokenCookie,
+            result.AccessToken,
+            accessTokenOptions);
+
+        Response.Cookies.Append(
+            RefreshTokenCookie,
+            result.RefreshToken,
+            refreshTokenOptions);
+    }
+
+
+    private CookieOptions CreateCookieOptions(
+        DateTime expiresAt)
+    {
+        return new CookieOptions
+        {
+            HttpOnly = true,
+
+            Secure = true,
+
+            SameSite = SameSiteMode.None,
+
+            Expires = expiresAt,
+
+            Path = "/"
+        };
+    }
+
+
+    private void ClearAuthCookies()
+    {
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Path = "/"
+        };
+
+        Response.Cookies.Delete(
+            AccessTokenCookie,
+            cookieOptions);
+
+        Response.Cookies.Delete(
+            RefreshTokenCookie,
+            cookieOptions);
     }
 }

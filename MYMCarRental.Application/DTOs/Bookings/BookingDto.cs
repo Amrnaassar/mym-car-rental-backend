@@ -12,9 +12,7 @@ public class BookingDto
 
     public string CarName { get; set; } = string.Empty;
 
-    public int PickupLocationId { get; set; }
-
-    public string PickupLocationName { get; set; } = string.Empty;
+    public string PickupLocation { get; set; } = string.Empty;
 
     public DateTime PickupDate { get; set; }
 

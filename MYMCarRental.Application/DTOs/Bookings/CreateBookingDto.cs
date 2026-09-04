@@ -8,7 +8,8 @@ public class CreateBookingDto
     public int CarId { get; set; }
 
     [Required]
-    public int PickupLocationId { get; set; }
+    [MaxLength(100)]
+    public string PickupLocation { get; set; } = string.Empty;
 
     [Required]
     public DateTime PickupDate { get; set; }

@@ -22,6 +22,10 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.HasIndex(b => b.BookingNumber)
             .IsUnique();
 
+        builder.Property(b => b.PickupLocation)
+            .IsRequired()
+            .HasMaxLength(100);
+
         builder.Property(b => b.CustomerFullName)
             .IsRequired()
             .HasMaxLength(150);
@@ -97,10 +101,5 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
             .WithMany(u => u.Bookings)
             .HasForeignKey(b => b.UserId)
             .OnDelete(DeleteBehavior.SetNull);
-
-        builder.HasOne(b => b.PickupLocation)
-            .WithMany(l => l.Bookings)
-            .HasForeignKey(b => b.PickupLocationId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

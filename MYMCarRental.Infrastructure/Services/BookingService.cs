@@ -30,6 +30,12 @@ public class BookingService : IBookingService
                 "Return date must be after pickup date.");
         }
 
+        if (string.IsNullOrWhiteSpace(dto.PickupLocation))
+        {
+            throw new InvalidOperationException(
+                "Pickup location is required.");
+        }
+
         var pickupDate = dto.PickupDate.ToUniversalTime();
         var returnDate = dto.ReturnDate.ToUniversalTime();
 
@@ -56,17 +62,6 @@ public class BookingService : IBookingService
         {
             throw new InvalidOperationException(
                 "Car not found or inactive.");
-        }
-
-        var location = await _context.Locations
-            .FirstOrDefaultAsync(l =>
-                l.Id == dto.PickupLocationId &&
-                l.IsActive);
-
-        if (location is null)
-        {
-            throw new InvalidOperationException(
-                "Pickup location not found or inactive.");
         }
 
         var hasConflict = await _context.Bookings
@@ -120,20 +115,26 @@ public class BookingService : IBookingService
             BookingNumber =
                 await GenerateBookingNumberAsync(),
 
-            CarId = car.Id,
+            CarId =
+                car.Id,
 
-            UserId = userId,
+            UserId =
+                userId,
 
-            PickupLocationId =
-                location.Id,
+            PickupLocation =
+                dto.PickupLocation.Trim(),
 
-            PickupDate = pickupDate,
+            PickupDate =
+                pickupDate,
 
-            ReturnDate = returnDate,
+            ReturnDate =
+                returnDate,
 
-            RentalDays = rentalDays,
+            RentalDays =
+                rentalDays,
 
-            RentalPlan = rentalPlan,
+            RentalPlan =
+                rentalPlan,
 
             CustomerFullName =
                 dto.CustomerFullName.Trim(),
@@ -158,16 +159,20 @@ public class BookingService : IBookingService
             MonthlyRateSnapshot =
                 car.PricePerMonth,
 
-            RentalCost = rentalCost,
+            RentalCost =
+                rentalCost,
 
-            InsuranceCost = insuranceCost,
+            InsuranceCost =
+                insuranceCost,
 
-            TaxCost = taxCost,
+            TaxCost =
+                taxCost,
 
             DiscountAmount =
                 discountAmount,
 
-            GrandTotal = grandTotal,
+            GrandTotal =
+                grandTotal,
 
             Status =
                 BookingStatus.Pending,
@@ -177,9 +182,11 @@ public class BookingService : IBookingService
                     ? null
                     : dto.Notes.Trim(),
 
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt =
+                DateTime.UtcNow,
 
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt =
+                DateTime.UtcNow
         };
 
         _context.Bookings.Add(booking);
@@ -201,7 +208,8 @@ public class BookingService : IBookingService
             .Where(b => b.Id == id)
             .Select(b => new BookingDto
             {
-                Id = b.Id,
+                Id =
+                    b.Id,
 
                 BookingNumber =
                     b.BookingNumber,
@@ -212,11 +220,8 @@ public class BookingService : IBookingService
                 CarName =
                     b.Car.NameEn,
 
-                PickupLocationId =
-                    b.PickupLocationId,
-
-                PickupLocationName =
-                    b.PickupLocation.Name,
+                PickupLocation =
+                    b.PickupLocation,
 
                 PickupDate =
                     b.PickupDate,
@@ -284,7 +289,8 @@ public class BookingService : IBookingService
             .OrderByDescending(b => b.CreatedAt)
             .Select(b => new BookingDto
             {
-                Id = b.Id,
+                Id =
+                    b.Id,
 
                 BookingNumber =
                     b.BookingNumber,
@@ -295,11 +301,8 @@ public class BookingService : IBookingService
                 CarName =
                     b.Car.NameEn,
 
-                PickupLocationId =
-                    b.PickupLocationId,
-
-                PickupLocationName =
-                    b.PickupLocation.Name,
+                PickupLocation =
+                    b.PickupLocation,
 
                 PickupDate =
                     b.PickupDate,
@@ -366,7 +369,8 @@ public class BookingService : IBookingService
             .OrderByDescending(b => b.CreatedAt)
             .Select(b => new BookingDto
             {
-                Id = b.Id,
+                Id =
+                    b.Id,
 
                 BookingNumber =
                     b.BookingNumber,
@@ -377,11 +381,8 @@ public class BookingService : IBookingService
                 CarName =
                     b.Car.NameEn,
 
-                PickupLocationId =
-                    b.PickupLocationId,
-
-                PickupLocationName =
-                    b.PickupLocation.Name,
+                PickupLocation =
+                    b.PickupLocation,
 
                 PickupDate =
                     b.PickupDate,
@@ -459,8 +460,11 @@ public class BookingService : IBookingService
                 "The booking status cannot be changed.");
         }
 
-        booking.Status = status;
-        booking.UpdatedAt = DateTime.UtcNow;
+        booking.Status =
+            status;
+
+        booking.UpdatedAt =
+            DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
 

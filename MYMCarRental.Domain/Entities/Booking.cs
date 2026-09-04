@@ -12,7 +12,7 @@ public class Booking
 
     public Guid? UserId { get; set; }
 
-    public int PickupLocationId { get; set; }
+    public string PickupLocation { get; set; } = string.Empty;
 
     public DateTime PickupDate { get; set; }
 
@@ -57,6 +57,4 @@ public class Booking
     public Car Car { get; set; } = null!;
 
     public User? User { get; set; }
-
-    public Location PickupLocation { get; set; } = null!;
 }
