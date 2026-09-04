@@ -16,7 +16,7 @@ public class User
 
     public UserRole Role { get; set; } = UserRole.Customer;
 
-    public string? RefreshToken { get; set; }
+    public string? RefreshTokenHash { get; set; }
 
     public DateTime? RefreshTokenExpiresAt { get; set; }
 

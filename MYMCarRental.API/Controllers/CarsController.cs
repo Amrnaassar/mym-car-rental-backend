@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MYMCarRental.Application.DTOs.Cars;
 using MYMCarRental.Application.Interfaces;
 
@@ -17,9 +18,11 @@ public class CarsController : ControllerBase
 
     // =========================
     // GET: api/cars
+    // Public
     // =========================
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var cars = await _carService.GetAllAsync();
@@ -29,9 +32,11 @@ public class CarsController : ControllerBase
 
     // =========================
     // GET: api/cars/featured
+    // Public
     // =========================
 
     [HttpGet("featured")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetFeatured()
     {
         var cars = await _carService.GetFeaturedAsync();
@@ -41,9 +46,11 @@ public class CarsController : ControllerBase
 
     // =========================
     // GET: api/cars/{id}
+    // Public
     // =========================
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var car = await _carService.GetByIdAsync(id);
@@ -61,9 +68,11 @@ public class CarsController : ControllerBase
 
     // =========================
     // POST: api/cars
+    // Manager only
     // =========================
 
     [HttpPost]
+    [Authorize(Roles = "Manager")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Create(
         [FromForm] CreateCarDto dto,
@@ -84,12 +93,16 @@ public class CarsController : ControllerBase
                         {
                             return BadRequest(new
                             {
-                                message = "One of the uploaded images is empty."
+                                message =
+                                    "One of the uploaded images is empty."
                             });
                         }
 
                         imageStreams.Add(
-                            (image.OpenReadStream(), image.FileName));
+                            (
+                                image.OpenReadStream(),
+                                image.FileName
+                            ));
                     }
                 }
 
@@ -121,9 +134,11 @@ public class CarsController : ControllerBase
 
     // =========================
     // PUT: api/cars/{id}
+    // Manager only
     // =========================
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Manager")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Update(
         int id,
@@ -145,12 +160,16 @@ public class CarsController : ControllerBase
                         {
                             return BadRequest(new
                             {
-                                message = "One of the uploaded images is empty."
+                                message =
+                                    "One of the uploaded images is empty."
                             });
                         }
 
                         imageStreams.Add(
-                            (image.OpenReadStream(), image.FileName));
+                            (
+                                image.OpenReadStream(),
+                                image.FileName
+                            ));
                     }
                 }
 
@@ -188,9 +207,11 @@ public class CarsController : ControllerBase
 
     // =========================
     // DELETE: api/cars/{id}
+    // Manager only
     // =========================
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> Delete(int id)
     {
         try
@@ -217,10 +238,13 @@ public class CarsController : ControllerBase
     }
 
     // =========================
-    // DELETE: api/cars/{carId}/images/{imageId}
+    // DELETE:
+    // api/cars/{carId}/images/{imageId}
+    // Manager only
     // =========================
 
     [HttpDelete("{carId:int}/images/{imageId:int}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> DeleteImage(
         int carId,
         int imageId)
@@ -251,17 +275,21 @@ public class CarsController : ControllerBase
     }
 
     // =========================
-    // PUT: api/cars/{carId}/images/{imageId}/primary
+    // PUT:
+    // api/cars/{carId}/images/{imageId}/primary
+    // Manager only
     // =========================
 
     [HttpPut("{carId:int}/images/{imageId:int}/primary")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> SetPrimaryImage(
         int carId,
         int imageId)
     {
-        var updated = await _carService.SetPrimaryImageAsync(
-            carId,
-            imageId);
+        var updated =
+            await _carService.SetPrimaryImageAsync(
+                carId,
+                imageId);
 
         if (!updated)
         {

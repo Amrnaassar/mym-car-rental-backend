@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MYMCarRental.Application.DTOs.Categories;
 using MYMCarRental.Application.Interfaces;
 
@@ -17,6 +18,7 @@ public class CategoriesController : ControllerBase
 
     // GET: api/categories
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var categories = await _categoryService.GetAllAsync();
@@ -26,6 +28,7 @@ public class CategoriesController : ControllerBase
 
     // GET: api/categories/1
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var category = await _categoryService.GetByIdAsync(id);
@@ -43,6 +46,7 @@ public class CategoriesController : ControllerBase
 
     // GET: api/categories/slug/suv
     [HttpGet("slug/{slug}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetBySlug(string slug)
     {
         var category = await _categoryService.GetBySlugAsync(slug);
@@ -60,6 +64,7 @@ public class CategoriesController : ControllerBase
 
     // POST: api/categories
     [HttpPost]
+    [Authorize(Roles = "Manager")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Create(
         [FromForm] CreateCategoryDto dto,
@@ -113,6 +118,7 @@ public class CategoriesController : ControllerBase
 
     // PUT: api/categories/1
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Manager")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Update(
         int id,
@@ -173,6 +179,8 @@ public class CategoriesController : ControllerBase
 
     // DELETE: api/categories/1
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Manager")]
+
     public async Task<IActionResult> Delete(int id)
     {
         try
