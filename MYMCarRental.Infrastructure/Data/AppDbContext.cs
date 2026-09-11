@@ -16,6 +16,8 @@ public class AppDbContext : DbContext
 
     public DbSet<CarImage> CarImages => Set<CarImage>();
 
+    public DbSet<CarFeatures> CarFeatures => Set<CarFeatures>();
+
     public DbSet<User> Users => Set<User>();
 
     public DbSet<Booking> Bookings => Set<Booking>();

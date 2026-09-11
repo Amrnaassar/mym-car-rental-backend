@@ -76,5 +76,7 @@ public class Car
 
     public ICollection<CarImage> Images { get; set; } = new List<CarImage>();
 
+    public ICollection<CarFeatures> Features { get; set; } = new List<CarFeatures>();
+
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 }

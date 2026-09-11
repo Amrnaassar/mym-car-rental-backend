@@ -80,6 +80,29 @@ public class UserService : IUserService
     }
 
     // =========================
+    // Update Role
+    // =========================
+
+    public async Task<bool> UpdateRoleAsync(
+        Guid id,
+        UpdateUserRoleDto dto)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user is null)
+        {
+            return false;
+        }
+
+        user.Role = dto.Role;
+
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    // =========================
     // Delete
     // =========================
 

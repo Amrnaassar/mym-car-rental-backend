@@ -10,5 +10,7 @@ public interface IUserService
 
     Task<IEnumerable<UserDto>> GetAllAsync();
 
+    Task<bool> UpdateRoleAsync(Guid id, UpdateUserRoleDto dto);
+
     Task<bool> DeleteAsync(Guid id);
 }

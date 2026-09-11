@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MYMCarRental.Application.DTOs.Users;
 using MYMCarRental.Application.Interfaces;
 
 namespace MYMCarRental.API.Controllers;
@@ -45,6 +46,31 @@ public class UsersController : ControllerBase
                 message = "User not found."
             });
         }
+
+        return Ok(user);
+    }
+
+    // =========================
+    // PUT: api/users/{id}/role
+    // =========================
+
+    [HttpPut("{id:guid}/role")]
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> UpdateRole(
+        Guid id,
+        [FromBody] UpdateUserRoleDto dto)
+    {
+        var updated = await _userService.UpdateRoleAsync(id, dto);
+
+        if (!updated)
+        {
+            return NotFound(new
+            {
+                message = "User not found."
+            });
+        }
+
+        var user = await _userService.GetByIdAsync(id);
 
         return Ok(user);
     }
