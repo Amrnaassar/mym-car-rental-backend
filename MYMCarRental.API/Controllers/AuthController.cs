@@ -1,8 +1,9 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MYMCarRental.Application.DTOs.Auth;
 using MYMCarRental.Application.Interfaces;
+using System.Security.Claims;
 
 namespace MYMCarRental.API.Controllers;
 
@@ -27,6 +28,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("google")]
     [AllowAnonymous]
+    [EnableRateLimiting("AuthLimiter")]
     public async Task<IActionResult> GoogleLogin(
         [FromBody] GoogleLoginDto dto)
     {
@@ -62,6 +64,8 @@ public class AuthController : ControllerBase
 
     [HttpPost("refresh-token")]
     [AllowAnonymous]
+    [EnableRateLimiting("RefreshLimiter")]
+
     public async Task<IActionResult> RefreshToken()
     {
         var refreshToken =
@@ -108,6 +112,7 @@ public class AuthController : ControllerBase
 
     [HttpGet("me")]
     [Authorize]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> Me()
     {
         var userIdClaim =
@@ -143,6 +148,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("logout")]
     [Authorize]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> Logout()
     {
         var userIdClaim =

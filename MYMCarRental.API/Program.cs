@@ -1,13 +1,17 @@
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using MYMCarRental.Application.Interfaces;
 using MYMCarRental.Application.Settings;
 using MYMCarRental.Infrastructure.Data;
+using MYMCarRental.Infrastructure.Email;
 using MYMCarRental.Infrastructure.Services;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +78,158 @@ builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddScoped<IJwtService,JwtService>();
 
 builder.Services.AddScoped<IBookingService,BookingService>();
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection(
+        EmailSettings.SectionName));
+
+builder.Services.AddScoped<IContactService, ContactService>();
+
+
+
+
+// ========================================================
+// Rate Limiter
+// ========================================================
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode =
+        StatusCodes.Status429TooManyRequests;
+
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.ContentType =
+            "application/json";
+
+        await context.HttpContext.Response
+            .WriteAsJsonAsync(
+                new
+                {
+                    success = false,
+                    message =
+                        "Too many requests. Please try again later."
+                },
+                cancellationToken: token);
+    };
+
+
+    // ====================================================
+    // Authentication Endpoints
+    // 5 requests / minute
+    // ====================================================
+
+    options.AddPolicy("AuthLimiter", httpContext =>
+    {
+        var key =
+            httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+
+            factory: _ =>
+                new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 5,
+
+                    Window = TimeSpan.FromMinutes(1),
+
+                    QueueLimit = 0,
+
+                    AutoReplenishment = true
+                });
+    });
+
+
+    // ====================================================
+    // Refresh Token
+    // 10 requests / minute
+    // ====================================================
+
+    options.AddPolicy("RefreshLimiter", httpContext =>
+    {
+        var key =
+            httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+
+            factory: _ =>
+                new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 10,
+
+                    Window = TimeSpan.FromMinutes(1),
+
+                    QueueLimit = 0,
+
+                    AutoReplenishment = true
+                });
+    });
+
+
+    // ====================================================
+    // General Authenticated Endpoints
+    // 60 requests / minute
+    // ====================================================
+
+    options.AddPolicy("GeneralLimiter", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)
+                ?.Value;
+
+        var key =
+            userId ??
+            httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+
+            factory: _ =>
+                new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 60,
+
+                    Window = TimeSpan.FromMinutes(1),
+
+                    QueueLimit = 0,
+
+                    AutoReplenishment = true
+                });
+    });
+
+    // ====================================================
+    // Contact Form
+    // 3 requests / 10 minutes
+    // ====================================================
+
+    options.AddPolicy("ContactLimiter", httpContext =>
+    {
+        var key =
+            httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+
+            factory: _ =>
+                new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 3,
+
+                    Window = TimeSpan.FromMinutes(10),
+
+                    QueueLimit = 0,
+
+                    AutoReplenishment = true
+                });
+    });
+});
 
 // ========================================================
 // JWT Settings
@@ -209,6 +365,8 @@ app.UseSwaggerUI();
 app.UseCors("AngularClient");
 
 app.UseAuthentication();
+
+app.UseRateLimiter();
 
 app.UseAuthorization();
 

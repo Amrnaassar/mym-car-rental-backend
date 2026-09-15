@@ -1,9 +1,10 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MYMCarRental.Application.DTOs.Bookings;
 using MYMCarRental.Application.Interfaces;
 using MYMCarRental.Domain.Enums;
+using System.Security.Claims;
 
 namespace MYMCarRental.API.Controllers;
 
@@ -26,6 +27,8 @@ public class BookingsController : ControllerBase
 
     [HttpPost]
     [Authorize]
+    [EnableRateLimiting("GeneralLimiter")]
+
     public async Task<IActionResult> Create(
         [FromBody] CreateBookingDto dto)
     {
@@ -70,6 +73,7 @@ public class BookingsController : ControllerBase
 
     [HttpGet("my")]
     [Authorize]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetMyBookings()
     {
         var userIdClaim =
@@ -97,6 +101,7 @@ public class BookingsController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Employee,Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetAll()
     {
         var bookings =
@@ -112,6 +117,7 @@ public class BookingsController : ControllerBase
 
     [HttpGet("{id:guid}")]
     [Authorize(Roles = "Employee,Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var booking =
@@ -135,6 +141,7 @@ public class BookingsController : ControllerBase
 
     [HttpPut("{id:guid}/status")]
     [Authorize(Roles = "Employee,Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> UpdateStatus(
         Guid id,
         [FromBody] UpdateBookingStatusDto dto)
@@ -174,6 +181,7 @@ public class BookingsController : ControllerBase
 
     [HttpDelete("{id:guid}/cancel")]
     [Authorize]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> Cancel(Guid id)
     {
         var userIdClaim =

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MYMCarRental.Application.DTOs.Categories;
 using MYMCarRental.Application.Interfaces;
 
@@ -19,6 +20,7 @@ public class CategoriesController : ControllerBase
     // GET: api/categories
     [HttpGet]
     [AllowAnonymous]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetAll()
     {
         var categories = await _categoryService.GetAllAsync();
@@ -29,6 +31,7 @@ public class CategoriesController : ControllerBase
     // GET: api/categories/1
     [HttpGet("{id:int}")]
     [AllowAnonymous]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetById(int id)
     {
         var category = await _categoryService.GetByIdAsync(id);
@@ -47,6 +50,7 @@ public class CategoriesController : ControllerBase
     // GET: api/categories/slug/suv
     [HttpGet("slug/{slug}")]
     [AllowAnonymous]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetBySlug(string slug)
     {
         var category = await _categoryService.GetBySlugAsync(slug);
@@ -66,6 +70,7 @@ public class CategoriesController : ControllerBase
     [HttpPost]
     [Authorize(Roles = "Manager")]
     [Consumes("multipart/form-data")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> Create(
         [FromForm] CreateCategoryDto dto,
         IFormFile? image)
@@ -120,6 +125,7 @@ public class CategoriesController : ControllerBase
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Manager")]
     [Consumes("multipart/form-data")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> Update(
         int id,
         [FromForm] UpdateCategoryDto dto,
@@ -180,7 +186,7 @@ public class CategoriesController : ControllerBase
     // DELETE: api/categories/1
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Manager")]
-
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> Delete(int id)
     {
         try

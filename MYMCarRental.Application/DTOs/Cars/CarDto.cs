@@ -69,6 +69,12 @@ public class CarDto
     public bool IsFeatured { get; set; }
 
     // =========================
+    // Features
+    // =========================
+
+    public List<CarFeatureDto> Features { get; set; } = new();
+
+    // =========================
     // Images
     // =========================
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MYMCarRental.Application.DTOs.Cars;
 using MYMCarRental.Application.Interfaces;
 
@@ -23,6 +24,7 @@ public class CarsController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetAll()
     {
         var cars = await _carService.GetAllAsync();
@@ -37,6 +39,7 @@ public class CarsController : ControllerBase
 
     [HttpGet("featured")]
     [AllowAnonymous]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetFeatured()
     {
         var cars = await _carService.GetFeaturedAsync();
@@ -51,6 +54,7 @@ public class CarsController : ControllerBase
 
     [HttpGet("{id:int}")]
     [AllowAnonymous]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetById(int id)
     {
         var car = await _carService.GetByIdAsync(id);
@@ -74,6 +78,7 @@ public class CarsController : ControllerBase
     [HttpPost]
     [Authorize(Roles = "Manager")]
     [Consumes("multipart/form-data")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> Create(
         [FromForm] CreateCarDto dto,
         [FromForm] List<IFormFile>? images)
@@ -140,6 +145,7 @@ public class CarsController : ControllerBase
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Manager")]
     [Consumes("multipart/form-data")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> Update(
         int id,
         [FromForm] UpdateCarDto dto,
@@ -212,6 +218,8 @@ public class CarsController : ControllerBase
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
+
     public async Task<IActionResult> Delete(int id)
     {
         try
@@ -245,6 +253,7 @@ public class CarsController : ControllerBase
 
     [HttpDelete("{carId:int}/images/{imageId:int}")]
     [Authorize(Roles = "Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> DeleteImage(
         int carId,
         int imageId)
@@ -282,6 +291,7 @@ public class CarsController : ControllerBase
 
     [HttpPut("{carId:int}/images/{imageId:int}/primary")]
     [Authorize(Roles = "Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> SetPrimaryImage(
         int carId,
         int imageId)

@@ -57,6 +57,12 @@ public class CreateCarDto
     public int Luggage { get; set; }
 
     // =========================
+    // Features
+    // =========================
+
+    public List<CarFeatureInputDto> Features { get; set; } = new();
+
+    // =========================
     // Featured
     // =========================
 

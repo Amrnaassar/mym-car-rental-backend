@@ -6,6 +6,7 @@ public interface IImageStorageService
         Stream fileStream,
         string fileName,
         string folder);
+    string GetOptimizedUrl( string publicId,int width = 800,int? height = null);
 
     Task DeleteAsync(string publicId);
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MYMCarRental.Application.DTOs.Users;
 using MYMCarRental.Application.Interfaces;
 
@@ -22,6 +23,7 @@ public class UsersController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetAll()
     {
         var users = await _userService.GetAllAsync();
@@ -35,6 +37,7 @@ public class UsersController : ControllerBase
 
     [HttpGet("{id:guid}")]
     [Authorize(Roles = "Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var user = await _userService.GetByIdAsync(id);
@@ -56,6 +59,7 @@ public class UsersController : ControllerBase
 
     [HttpPut("{id:guid}/role")]
     [Authorize(Roles = "Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> UpdateRole(
         Guid id,
         [FromBody] UpdateUserRoleDto dto)
@@ -81,6 +85,7 @@ public class UsersController : ControllerBase
 
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Manager")]
+    [EnableRateLimiting("GeneralLimiter")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var deleted = await _userService.DeleteAsync(id);

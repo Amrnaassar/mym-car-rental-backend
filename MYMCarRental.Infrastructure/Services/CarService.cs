@@ -29,6 +29,7 @@ public class CarService : ICarService
             .AsNoTracking()
             .Include(c => c.Category)
             .Include(c => c.Images)
+            .Include(c => c.Features)
             .OrderBy(c => c.NameEn)
             .ToListAsync();
 
@@ -45,6 +46,7 @@ public class CarService : ICarService
             .AsNoTracking()
             .Include(c => c.Category)
             .Include(c => c.Images)
+            .Include(c => c.Features)
             .Where(c => c.IsActive && c.IsFeatured)
             .OrderBy(c => c.NameEn)
             .ToListAsync();
@@ -62,6 +64,7 @@ public class CarService : ICarService
             .AsNoTracking()
             .Include(c => c.Category)
             .Include(c => c.Images)
+            .Include(c => c.Features)
             .FirstOrDefaultAsync(c => c.Id == id);
 
         return car is null ? null : MapToDto(car);
@@ -120,6 +123,20 @@ public class CarService : ICarService
         await _context.SaveChangesAsync();
 
         // =========================
+        // Add Features
+        // =========================
+
+        foreach (var feature in dto.Features)
+        {
+            car.Features.Add(new CarFeatures
+            {
+                CarId = car.Id,
+                featureAr = feature.FeatureAr.Trim(),
+                featureEn = feature.FeatureEn.Trim()
+            });
+        }
+
+        // =========================
         // Upload Images
         // =========================
 
@@ -171,6 +188,7 @@ public class CarService : ICarService
     {
         var car = await _context.Cars
             .Include(c => c.Images)
+            .Include(c => c.Features)
             .Include(c => c.Category)
             .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -215,6 +233,24 @@ public class CarService : ICarService
         car.IsFeatured = dto.IsFeatured;
 
         car.UpdatedAt = DateTime.UtcNow;
+
+        // =========================
+        // Update Features
+        // =========================
+
+        _context.CarFeatures.RemoveRange(car.Features);
+
+        car.Features.Clear();
+
+        foreach (var feature in dto.Features)
+        {
+            car.Features.Add(new CarFeatures
+            {
+                CarId = car.Id,
+                featureAr = feature.FeatureAr.Trim(),
+                featureEn = feature.FeatureEn.Trim()
+            });
+        }
 
         // =========================
         // Upload New Images
@@ -381,7 +417,7 @@ public class CarService : ICarService
     // Mapping
     // =========================
 
-    private static CarDto MapToDto(Car car)
+    private  CarDto MapToDto(Car car)
     {
         var primaryImage = car.Images
             .FirstOrDefault(i => i.IsPrimary);
@@ -418,14 +454,24 @@ public class CarService : ICarService
             IsActive = car.IsActive,
             IsFeatured = car.IsFeatured,
 
-            PrimaryImageUrl = primaryImage?.ImageUrl,
+            PrimaryImageUrl = primaryImage is null? null: _imageStorage.GetOptimizedUrl(primaryImage.PublicId,800,500),
+
+            Features = car.Features
+                .OrderBy(f => f.Id)
+                .Select(f => new CarFeatureDto
+                {
+                    Id = f.Id,
+                    FeatureAr = f.featureAr,
+                    FeatureEn = f.featureEn
+                })
+                .ToList(),
 
             Images = car.Images
                 .OrderBy(i => i.SortOrder)
                 .Select(i => new CarImageDto
                 {
                     Id = i.Id,
-                    ImageUrl = i.ImageUrl,
+                    ImageUrl = _imageStorage.GetOptimizedUrl(i.PublicId,1200),
                     IsPrimary = i.IsPrimary,
                     SortOrder = i.SortOrder
                 })

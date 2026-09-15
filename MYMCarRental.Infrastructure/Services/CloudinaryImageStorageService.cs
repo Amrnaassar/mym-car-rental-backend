@@ -40,6 +40,30 @@ public class CloudinaryImageStorageService : IImageStorageService
         );
     }
 
+    public string GetOptimizedUrl(
+    string publicId,
+    int width = 800,
+    int? height = null)
+    {
+        var transformation = new Transformation()
+            .FetchFormat("auto")
+            .Quality("auto")
+            .Width(width);
+
+        if (height.HasValue)
+        {
+            transformation.Height(height.Value)
+                .Crop("limit");
+        }
+
+        return _cloudinary.Api.UrlImgUp
+                    .Transform(new Transformation()
+                        .FetchFormat("auto")
+                        .Quality("auto")
+                        .Width(width))
+                    .BuildUrl(publicId);
+    }
+     
     public async Task DeleteAsync(string publicId)
     {
         var deleteParams = new DeletionParams(publicId);
