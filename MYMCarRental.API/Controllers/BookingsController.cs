@@ -80,9 +80,7 @@ public class BookingsController : ControllerBase
             User.FindFirst(
                 ClaimTypes.NameIdentifier)?.Value;
 
-        if (!Guid.TryParse(
-            userIdClaim,
-            out var userId))
+        if (!Guid.TryParse( userIdClaim, out var userId))
         {
             return Unauthorized();
         }

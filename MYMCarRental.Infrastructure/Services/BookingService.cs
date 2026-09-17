@@ -20,9 +20,7 @@ public class BookingService : IBookingService
         _context = context;
     }
 
-    public async Task<BookingDto> CreateAsync(
-        CreateBookingDto dto,
-        Guid? userId)
+    public async Task<BookingDto> CreateAsync(CreateBookingDto dto,Guid? userId)
     {
         if (dto.PickupDate >= dto.ReturnDate)
         {
@@ -200,8 +198,7 @@ public class BookingService : IBookingService
                 "Booking could not be loaded.");
     }
 
-    public async Task<BookingDto?> GetByIdAsync(
-        Guid id)
+    public async Task<BookingDto?> GetByIdAsync(Guid id)
     {
         return await _context.Bookings
             .AsNoTracking()
@@ -280,8 +277,7 @@ public class BookingService : IBookingService
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<BookingDto>>
-        GetMyBookingsAsync(Guid userId)
+    public async Task<IEnumerable<BookingDto>>GetMyBookingsAsync(Guid userId)
     {
         return await _context.Bookings
             .AsNoTracking()
@@ -361,8 +357,7 @@ public class BookingService : IBookingService
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<BookingDto>>
-        GetAllAsync()
+    public async Task<IEnumerable<BookingDto>> GetAllAsync()
     {
         return await _context.Bookings
             .AsNoTracking()
@@ -441,9 +436,7 @@ public class BookingService : IBookingService
             .ToListAsync();
     }
 
-    public async Task<bool> UpdateStatusAsync(
-        Guid id,
-        BookingStatus status)
+    public async Task<bool> UpdateStatusAsync(Guid id,BookingStatus status)
     {
         var booking = await _context.Bookings
             .FirstOrDefaultAsync(b => b.Id == id);
@@ -471,10 +464,7 @@ public class BookingService : IBookingService
         return true;
     }
 
-    public async Task<bool> CancelAsync(
-        Guid id,
-        Guid? userId,
-        bool isStaff)
+    public async Task<bool> CancelAsync(Guid id,Guid? userId,bool isStaff)
     {
         var booking = await _context.Bookings
             .FirstOrDefaultAsync(b => b.Id == id);
