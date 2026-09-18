@@ -1,57 +1,43 @@
-# MYM Car Rental API
+# MYM Car Rental — Backend API
 
-A scalable and secure RESTful backend API for a car rental platform, built with **ASP.NET Core Web API**, **C#**, **Entity Framework Core**, and **PostgreSQL**.
+A production-ready RESTful backend API for a modern car rental platform, built with **ASP.NET Core Web API, C#, Entity Framework Core, and PostgreSQL**.
 
-The API provides the core backend services required to manage rental cars, categories, customers, bookings, authentication, authorization, pricing, and image storage.
+The backend provides the core services for vehicle management, categories, bookings, authentication, authorization, pricing, image management, customer communication, and administrative operations.
+
+> **MYM Car Rental** is developed as a full-stack freelance software engineering project with a focus on clean architecture, security, scalability, maintainability, and real-world business workflows.
 
 ---
 
-## Overview
+## 🚗 Project Overview
 
-**MYM Car Rental API** is the backend service for a modern car rental web application.
+MYM Car Rental is a full-stack car rental platform designed to support both customers and administrative staff.
 
-The system is designed using a layered architecture to separate business logic, domain entities, application contracts, infrastructure services, and API endpoints.
+The backend exposes a secure REST API consumed by the Angular frontend and provides:
 
-It supports:
-
-* Car and category management
+* Vehicle and category management
 * Rental booking workflows
 * Daily, weekly, and monthly rental plans
-* Rental price calculation
-* Booking conflict validation
-* JWT authentication
-* Refresh token authentication flow
+* Dynamic rental price calculation
+* Booking availability and conflict validation
+* Customer authentication
+* Google authentication
+* JWT access tokens
+* Refresh token rotation
 * Role-based authorization
-* Google authentication support
-* Cloudinary image storage
+* Customer, Employee, and Manager roles
+* Cloudinary image management
 * Arabic and English content
-* Swagger/OpenAPI documentation
+* Contact email delivery
+* PostgreSQL persistence
 * Entity Framework Core migrations
+* Swagger / OpenAPI documentation
+* API rate limiting
 
 ---
 
-## Technology Stack
+# 🏗️ Architecture
 
-| Technology                       | Purpose                                        |
-| -------------------------------- | ---------------------------------------------- |
-| C#                               | Main programming language                      |
-| ASP.NET Core Web API             | RESTful API development                        |
-| .NET 10                          | Target framework                               |
-| Entity Framework Core            | ORM and database access                        |
-| PostgreSQL                       | Relational database                            |
-| JWT Bearer Authentication        | Secure API authentication                      |
-| Refresh Tokens                   | Session renewal                                |
-| Google.Apis.Auth                 | Google authentication support                  |
-| Cloudinary                       | Image upload and storage                       |
-| Swagger / OpenAPI                | API documentation                              |
-| Dependency Injection             | Service registration and dependency management |
-| Entity Framework Core Migrations | Database schema versioning                     |
-
----
-
-## Architecture
-
-The project follows a layered architecture:
+The backend follows a **layered Clean Architecture approach** that separates business rules, application contracts, infrastructure implementations, and HTTP concerns.
 
 ```text
 MYMCarRental
@@ -59,13 +45,13 @@ MYMCarRental
 ├── MYMCarRental.API
 │   ├── Controllers
 │   ├── Program.cs
-│   ├── appsettings.json
-│   └── API configuration
+│   ├── Middleware / Configuration
+│   └── Dependency Injection
 │
 ├── MYMCarRental.Application
 │   ├── DTOs
 │   ├── Interfaces
-│   └── Application settings
+│   └── Application Settings
 │
 ├── MYMCarRental.Domain
 │   ├── Entities
@@ -75,36 +61,45 @@ MYMCarRental
     ├── Data
     ├── Configurations
     ├── Services
+    ├── Authentication
+    ├── Email
+    ├── Cloudinary
     └── Migrations
 ```
 
 ### Layer Responsibilities
 
-#### API Layer
+#### API
 
 Responsible for:
 
 * HTTP endpoints
-* Request handling
-* Authentication and authorization
-* Controller responses
-* Swagger configuration
-* Dependency injection configuration
+* Controllers
+* Authentication and authorization configuration
+* Dependency injection
+* Swagger/OpenAPI
+* API middleware and infrastructure configuration
 
-#### Application Layer
+#### Application
 
-Contains:
+Contains the application's contracts and DTOs:
 
-* DTOs
+* Data Transfer Objects
 * Service interfaces
-* JWT settings
-* Application contracts
+* JWT configuration models
+* Application-level abstractions
 
-This layer defines how the application services communicate without depending directly on implementation details.
+The Application layer does not depend on infrastructure implementations.
 
-#### Domain Layer
+#### Domain
 
-Contains the core business entities and enums, including:
+Contains the core business model:
+
+* Entities
+* Enums
+* Core business concepts
+
+Main entities include:
 
 * `Car`
 * `CarCategory`
@@ -112,367 +107,350 @@ Contains the core business entities and enums, including:
 * `CarFeatures`
 * `Booking`
 * `User`
-* `RentalPlan`
-* `BookingStatus`
-* `FuelType`
-* `Transmission`
-* `UserRole`
 
-#### Infrastructure Layer
+#### Infrastructure
 
-Responsible for:
+Contains implementation details such as:
 
-* Database access
-* Entity Framework Core configurations
-* Service implementations
+* Entity Framework Core
+* PostgreSQL access
+* Database configurations
 * Authentication services
-* JWT token generation
-* Booking logic
-* Image storage
+* JWT generation
+* Refresh token management
+* Booking services
+* Cloudinary integration
+* Email services
 * Database migrations
 
 ---
 
-## Main Features
+# 🛠️ Technology Stack
 
-### Car Management
+| Technology                     | Purpose                         |
+| ------------------------------ | ------------------------------- |
+| **C#**                         | Backend programming language    |
+| **ASP.NET Core Web API**       | REST API framework              |
+| **.NET 10**                    | Target framework                |
+| **Entity Framework Core**      | ORM and data access             |
+| **PostgreSQL**                 | Relational database             |
+| **Npgsql**                     | PostgreSQL provider for EF Core |
+| **JWT**                        | Access token authentication     |
+| **Refresh Tokens**             | Secure session renewal          |
+| **Google.Apis.Auth**           | Google authentication           |
+| **Cloudinary**                 | Image storage                   |
+| **MailKit / MimeKit**          | Email delivery                  |
+| **Swagger / OpenAPI**          | API documentation               |
+| **ASP.NET Core Rate Limiting** | API protection                  |
+| **Dependency Injection**       | Service composition             |
+| **EF Core Migrations**         | Database schema versioning      |
 
-The API supports managing rental vehicles with information such as:
+---
 
-* Car name
-* Brand and model information
-* Vehicle specifications
+# ✨ Core Features
+
+## 🚘 Car Management
+
+The API supports complete vehicle management.
+
+Each car can contain:
+
+* Brand
+* Model
+* Description
 * Fuel type
-* Transmission type
-* Number of seats
-* Number of doors
+* Transmission
+* Seats
+* Doors
 * Luggage capacity
-* Daily rental price
-* Weekly rental price
-* Monthly rental price
-* Car images
-* Active/inactive status
-* Featured car status
+* Daily price
+* Weekly price
+* Monthly price
+* Active status
+* Featured status
+* Multiple images
+* Primary image
+* Additional vehicle features
 
-### Category Management
+Administrative users can:
 
-Supports:
+* Create cars
+* Update cars
+* Delete cars
+* Upload images
+* Delete images
+* Set primary images
+* Manage vehicle features
 
-* Creating car categories
-* Updating categories
-* Retrieving categories
-* Managing category images
-* Arabic and English category names
+---
 
-### Booking Management
+## 🏷️ Category Management
 
-The booking system supports:
+Car categories support:
 
-* Creating rental bookings
-* Retrieving customer bookings
-* Retrieving booking details
-* Managing booking statuses
-* Cancelling bookings
-* Staff booking management
-* Customer and staff booking permissions
+* Create
+* Read
+* Update
+* Delete
+* Category images
+* Arabic names
+* English names
+* Slug-based retrieval
 
-Supported booking statuses include:
+---
 
-* `Pending`
-* `Confirmed`
-* `Cancelled`
-* `Completed`
+# 📅 Booking System
 
-### Rental Plans and Pricing
+The booking service implements the core rental workflow.
 
-The system supports multiple rental plans:
+Customers can create rental bookings by selecting:
 
-* Daily
-* Weekly
-* Monthly
+* Vehicle
+* Pickup location
+* Return location
+* Pickup date
+* Return date
+* Rental plan
+* Optional notes
 
-The booking service calculates:
+The backend validates the booking before creating it.
+
+### Booking Validation
+
+The system validates:
+
+* Pickup date must be before return date
+* Valid pickup location
+* Vehicle availability
+* Existing active bookings
+* Overlapping rental periods
+
+Overlapping bookings are detected using the rental interval:
+
+```text
+Existing Pickup < Requested Return
+AND
+Existing Return > Requested Pickup
+```
+
+This prevents the same vehicle from being booked for conflicting rental periods.
+
+---
+
+# 💰 Rental Pricing
+
+The backend supports three rental plans:
+
+```text
+Daily
+Weekly
+Monthly
+```
+
+Rental pricing is calculated server-side.
+
+The booking calculation includes:
 
 * Rental duration
+* Selected rental plan
 * Base rental cost
-* Insurance cost
-* Discount amount
-* Tax amount
-* Final total price
+* Insurance
+* Discount
+* Tax
+* Grand total
 
-The pricing information is calculated during the booking process and stored with the booking data.
+The calculated pricing information is stored with the booking so the booking retains the pricing snapshot used at creation time.
 
-### Booking Conflict Validation
+---
 
-The backend validates rental dates to help prevent overlapping bookings for the same vehicle.
+# 🔐 Authentication
 
-This ensures that a car cannot be booked for conflicting rental periods.
+The API uses secure token-based authentication.
 
-### Authentication and Authorization
-
-The API includes secure authentication features using:
+Supported authentication mechanisms include:
 
 * JWT access tokens
 * Refresh tokens
-* JWT bearer authentication
-* Protected endpoints
+* Google authentication
+* Protected API endpoints
 * Role-based authorization
-* Google authentication support
 
-The system supports different user roles, including:
+### Access Token
 
-* Customer
-* Employee
-* Manager
+JWT access tokens contain claims such as:
 
-Access to administrative operations is restricted according to the authenticated user's role.
+```text
+User ID
+Name
+Email
+Role
+JWT ID
+```
 
-### Image Storage
+### Refresh Token
 
-Car and category images are managed through **Cloudinary**.
+Refresh tokens are:
 
-The image storage service supports:
+* Cryptographically generated
+* Stored as hashes
+* Rotated during refresh
+* Expiration controlled through configuration
 
-* Uploading images
-* Storing image URLs
-* Managing public image identifiers
-* Removing stored images
+This prevents storing raw refresh tokens in the database.
 
-### Multilingual Support
+---
 
-The backend supports Arabic and English content through bilingual properties such as:
+# 👥 Authorization & Roles
+
+The system supports three primary roles:
+
+```text
+Customer
+Employee
+Manager
+```
+
+Administrative functionality is protected using role-based authorization.
+
+For example:
+
+```text
+Customer
+   │
+   ├── Browse cars
+   ├── View categories
+   └── Create/manage own bookings
+
+Employee
+   │
+   └── Operational booking access
+
+Manager
+   │
+   ├── Manage cars
+   ├── Manage categories
+   ├── Manage users
+   └── Administrative operations
+```
+
+---
+
+# 🔑 Google Authentication
+
+The API supports Google authentication through Google's identity token validation.
+
+The backend:
+
+1. Receives the Google credential.
+2. Validates the token.
+3. Verifies the Google account information.
+4. Finds or creates the application user.
+5. Generates application authentication tokens.
+
+New Google users are assigned the default customer role.
+
+---
+
+# 🖼️ Cloudinary Image Management
+
+Vehicle and category images are stored using **Cloudinary**.
+
+The backend manages:
+
+* Image uploads
+* Image URLs
+* Public IDs
+* Primary image selection
+* Image deletion
+
+This keeps binary image storage outside the application server and database.
+
+---
+
+# 📧 Email Integration
+
+The backend includes email functionality using:
+
+* MailKit
+* MimeKit
+* SMTP
+
+The contact service supports:
+
+* Customer name
+* Email
+* Phone
+* Message
+* Reply-to customer email
+
+User-provided content is HTML encoded before being included in outgoing messages.
+
+---
+
+# 🌍 Multilingual Content
+
+The backend supports bilingual content for the frontend.
+
+Examples include:
 
 ```text
 NameAr
 NameEn
 ```
 
-This allows the frontend to display localized content based on the selected language.
+This allows the Angular frontend to display Arabic or English content without duplicating database records.
 
 ---
 
-## API Controllers
+# 🛡️ Security
 
-The project currently includes the following controllers:
+Security is considered throughout the API architecture.
 
-| Controller             | Responsibility                                        |
-| ---------------------- | ----------------------------------------------------- |
-| `AuthController`       | Authentication, login, registration, token operations |
-| `CarsController`       | Car management                                        |
-| `CategoriesController` | Car category management                               |
-| `BookingsController`   | Booking creation and management                       |
-| `UsersController`      | User management                                       |
+Implemented security mechanisms include:
 
----
-
-## Example API Routes
-
-### Authentication
-
-```http
-POST /api/auth
-```
-
-Authentication endpoints support login and token-related operations.
-
-### Cars
-
-```http
-GET    /api/cars
-GET    /api/cars/{id}
-POST   /api/cars
-PUT    /api/cars/{id}
-DELETE /api/cars/{id}
-```
-
-### Categories
-
-```http
-GET    /api/categories
-GET    /api/categories/{id}
-POST   /api/categories
-PUT    /api/categories/{id}
-DELETE /api/categories/{id}
-```
-
-### Bookings
-
-```http
-POST   /api/bookings
-GET    /api/bookings/my
-GET    /api/bookings
-GET    /api/bookings/{id}
-PUT    /api/bookings/{id}/status
-DELETE /api/bookings/{id}/cancel
-```
-
-> Exact endpoint availability and authorization requirements should be checked in the corresponding controller before integrating with the frontend.
-
----
-
-## Database
-
-The project uses:
-
-* **PostgreSQL**
-* **Entity Framework Core**
-* **Code First approach**
-* **Entity configurations**
-* **EF Core migrations**
-
-The database context is located in:
-
-```text
-MYMCarRental.Infrastructure/Data/AppDbContext.cs
-```
-
-Entity configurations are organized under:
-
-```text
-MYMCarRental.Infrastructure/Configurations
-```
-
-Database migrations are located under:
-
-```text
-MYMCarRental.Infrastructure/Migrations
-```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-Make sure you have the following installed:
-
-* .NET 10 SDK
-* PostgreSQL
-* Git
-* A code editor such as Visual Studio or Visual Studio Code
-* Cloudinary account for image storage
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/Amrnaassar/mym-car-rental-backend.git
-```
-
-Navigate to the project folder:
-
-```bash
-cd mym-car-rental-backend
-```
-
-### Configure the Application
-
-Update the configuration values in:
-
-```text
-MYMCarRental.API/appsettings.json
-```
-
-Required configuration areas include:
-
-* PostgreSQL connection string
-* JWT settings
-* Cloudinary credentials
-* Google authentication settings, if enabled
-
-Do not commit real passwords, API keys, JWT secrets, or private credentials to GitHub.
-
-### Apply Database Migrations
-
-From the solution directory, run:
-
-```bash
-dotnet ef database update \
-  --project MYMCarRental.Infrastructure \
-  --startup-project MYMCarRental.API
-```
-
-### Run the API
-
-```bash
-dotnet run --project MYMCarRental.API
-```
-
-The API can then be accessed through the configured local URL.
-
-### Swagger Documentation
-
-When the application is running, open the Swagger endpoint available in the API environment to explore and test the endpoints.
-
-Swagger provides documentation for:
-
-* Available endpoints
-* Request models
-* Response models
-* Authentication requirements
-* API testing
-
----
-
-## Security Considerations
-
-The API includes:
-
-* JWT token validation
-* Issuer and audience validation
+* JWT authentication
+* Refresh token hashing
+* Refresh token rotation
+* Issuer validation
+* Audience validation
 * Token lifetime validation
 * Signing key validation
 * Role-based authorization
-* Protected booking endpoints
+* Protected administrative endpoints
+* API rate limiting
+* Secure authentication cookies
+* HTTPS support
 * Configuration-based secrets
 
-For production deployment, make sure to:
+### Production Security
 
-* Use environment variables or secure secret storage
-* Use a strong JWT signing key
-* Configure production CORS origins
-* Enable HTTPS
-* Protect Cloudinary credentials
-* Use a secure PostgreSQL connection
-* Avoid committing sensitive configuration files
+Production secrets should be provided through environment variables or the hosting platform's secure configuration.
 
----
+Sensitive values should never be committed to Git.
 
-## Project Status
+Examples include:
 
-The backend is currently under active development as part of the **MYM Car Rental** platform.
-
-The project is being developed as a freelance full-stack software engineering project, with ongoing improvements to the rental workflows, frontend integration, and platform functionality.
+```text
+Database connection strings
+JWT signing keys
+Google credentials
+Cloudinary credentials
+SMTP credentials
+```
 
 ---
 
-## Related Repository
+# 🚦 API Rate Limiting
 
-Frontend repository:
+The API uses rate limiting to reduce abuse and protect sensitive endpoints.
 
-[MYM Car Rental Frontend](https://github.com/Amrnaassar/mym-car-rental-frontend)
+Rate limiting is applied to areas such as:
 
----
+* Authentication
+* Token refresh
+* Contact requests
+* General API requests
 
-## Author
-
-**Omar Fathi Salah**
-
-Full-Stack Software Engineer
-
-Specialized in:
-
-* ASP.NET Core
-* C#
-* Angular
-* RESTful APIs
-* Entity Framework Core
-* PostgreSQL
-* SQL Server
-* TypeScript
-* Full-Stack Web Development
+This provides an additional layer of protection against excessive requests.
 
 ---
-
-## License
-
-This project is private and intended for the MYM Car Rental platform.
