@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using MYMCarRental.API.Middleware;
 using MYMCarRental.Application.Interfaces;
 using MYMCarRental.Application.Settings;
 using MYMCarRental.Infrastructure.Data;
@@ -235,8 +236,7 @@ builder.Services.AddRateLimiter(options =>
 // JWT Settings
 // ========================================================
 
-builder.Services.Configure<JwtSettings>(
-    builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 var jwtSettings =
     builder.Configuration
@@ -356,11 +356,11 @@ var app = builder.Build();
 // Middleware
 // ========================================================
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseSwagger();
 
 app.UseSwaggerUI();
-
-//app.UseHttpsRedirection();
 
 app.UseCors("AngularClient");
 
