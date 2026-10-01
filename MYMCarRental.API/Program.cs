@@ -62,7 +62,7 @@ builder.Services.AddCors(options =>
             .WithOrigins(
                 "http://localhost:4200",
                 "http://localhost:4000",
-                "https://mym-car-rental-frontend-csg4eja3fhh6hwgz.westcentralus-01.azurewebsites.net"
+                "https://mym-car-rental.netlify.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
